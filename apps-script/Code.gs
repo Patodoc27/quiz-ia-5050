@@ -2583,10 +2583,22 @@ function encontrarRegistro_() {
         else if (t.indexOf("apellido") >= 0) colApe = j;
         else if (t.indexOf("nombre") >= 0) colNom = j;
       }
-      if (colCuest >= 0)
-        return { h: h, filaEnc: i, datos: datos,
+      if (colCuest >= 0) {
+        /* Encabezado de dos filas: si en esta fila no está la columna de
+           estudiantes (apellido/nombre), mirar la fila siguiente. */
+        var filaEnc = i;
+        if (colApe < 0 && colNom < 0 && i + 1 < datos.length) {
+          for (var j2 = 0; j2 < datos[i + 1].length; j2++) {
+            var t2 = norm_(datos[i + 1][j2]);
+            if (t2.indexOf("apellido") >= 0) colApe = j2;
+            else if (t2.indexOf("nombre") >= 0) colNom = j2;
+          }
+          if (colApe >= 0 || colNom >= 0) filaEnc = i + 1;
+        }
+        return { h: h, filaEnc: filaEnc, datos: datos,
           colCuest: colCuest, colPasap: colPasap, colDesemp: colDesemp,
           colApe: colApe, colNom: colNom };
+      }
     }
   }
   return null;
