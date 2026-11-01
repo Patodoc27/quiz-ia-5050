@@ -2456,6 +2456,38 @@ function ss_() { return SpreadsheetApp.openById(SPREADSHEET_ID); }
 function autorizar() {
   return ss_().getName();
 }
+/* Ejecutar UNA vez desde el editor (▶ Ejecutar) para volcar a la planilla
+   la mejor nota de cada estudiante que ya intentó el quiz, y recalcular
+   el top 5 de MEJOR DESEMPEÑO. Útil si hubo intentos antes de pegar este
+   código. Informa en el registro a quién no encontró en la lista. */
+function sincronizar() {
+  var reg = encontrarRegistro_();
+  if (!reg || reg.colCuest < 0) return "No encontré la columna CUESTIONARIO VIRTUAL.";
+  var mejores = {};
+  var datos = H_INTENTOS().getDataRange().getValues();
+  for (var i = 1; i < datos.length; i++) {
+    var v = datos[i];
+    if (v[7] !== "entregado") continue;
+    var clave = (String(v[3]) + "|" + String(v[4])).toLowerCase();
+    if (!mejores[clave] || Number(v[12] || 0) > mejores[clave].nota)
+      mejores[clave] = { apellido: v[3], nombre: v[4], estado: "entregado", nota: v[12] };
+  }
+  var ok = 0, sinFila = [];
+  for (var k in mejores) {
+    var e = mejores[k];
+    var f = filaDeEstudiante_(reg, e.apellido, e.nombre);
+    if (f >= 0) {
+      if (Number(e.nota) > numNota_(reg.datos[f][reg.colCuest]))
+        reg.h.getRange(f + 1, reg.colCuest + 1).setValue(e.nota);
+      ok++;
+    } else sinFila.push(e.apellido + " " + e.nombre);
+  }
+  actualizarTop5_();
+  var msg = "Sincronizados " + ok + " de " + (ok + sinFila.length) +
+    (sinFila.length ? " | SIN FILA EN LA PLANILLA: " + sinFila.join(", ") : "");
+  Logger.log(msg);
+  return msg;
+}
 function hoja_(nombre, encabezados) {
   var ss = ss_();
   var h = ss.getSheetByName(nombre);
