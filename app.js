@@ -552,6 +552,48 @@ function exportarCSV() {
 }
 
 /* ====== arranque ====== */
+/* ====== ranking público ====== */
+/* Medallas: oro (1°), plata (2°), bronce (3° a 5°). Esos cinco ganan el 10 adicional. */
+function medallaSVG(clase) {
+  return '<svg viewBox="0 0 24 24" class="medalla ' + clase + '" aria-hidden="true">' +
+    '<path d="M8 2h3.2L12 7l.8-5H16l-2.4 8.4" fill="none" stroke="currentColor" stroke-width="1.6"/>' +
+    '<circle cx="12" cy="15.5" r="6" fill="currentColor"/>' +
+    '<path d="M12 12.2l1 2 2.2.3-1.6 1.6.4 2.2-2-1-2 1 .4-2.2-1.6-1.6 2.2-.3z" fill="#fff"/></svg>';
+}
+function verRanking() {
+  mostrar("p-ranking");
+  var podio = $("rank-podium"), lista = $("rank-lista");
+  podio.innerHTML = ""; lista.innerHTML = "";
+  lista.appendChild(el("p", "nota-chica", "Cargando…"));
+  api({ action: "ranking" }).then(function (r) {
+    lista.innerHTML = "";
+    if (!r || !r.ok || !r.ranking || !r.ranking.length) {
+      lista.appendChild(el("p", "nota-chica", "Todavía no hay calificaciones: el primer intento puede ser el tuyo."));
+      return;
+    }
+    var medallas = ["oro", "plata", "bronce", "bronce", "bronce"];
+    r.ranking.forEach(function (e, i) {
+      var f = el("div", "rank-fila" + (i < 5 ? " med-" + medallas[i] : ""));
+      f.innerHTML = (i < 5 ? medallaSVG(medallas[i]) : '<span class="rank-pos">' + (i + 1) + '</span>');
+      var av = el("img", "rank-avatar");
+      av.src = AVATARES[e.avatar] || AVATARES[0];
+      av.alt = ""; f.appendChild(av);
+      var datos = el("span", "rank-datos");
+      datos.appendChild(el("b", "", e.apellido + ", " + e.nombre));
+      datos.appendChild(el("small", "", e.curso + " · " + e.correctas + " aciertos · " + fmtTiempo(e.segundos || 0) +
+        " · " + (e.intentos || 1) + " intento" + ((e.intentos || 1) === 1 ? "" : "s")));
+      f.appendChild(datos);
+      var nota = el("span", "rank-nota", String(e.nota).replace(".", ","));
+      if (e.nota >= NOTA_APROBADO) nota.classList.add("aprobada");
+      f.appendChild(nota);
+      if (i < 5) podio.appendChild(f); else lista.appendChild(f);
+    });
+  }).catch(function () {
+    lista.innerHTML = "";
+    lista.appendChild(el("p", "nota-chica", "Sin conexión con el servidor. Probá de nuevo en un rato."));
+  });
+}
+
 function init() {
   var guardado = leerLS() || {};
   estado.deviceId = guardado.deviceId;
@@ -597,6 +639,8 @@ function init() {
   });
   $("btn-volver-inicio").addEventListener("click", function () { mostrar("p-inicio"); });
   $("btn-docente").addEventListener("click", function () { mostrar("p-docente"); });
+  $("btn-ranking").addEventListener("click", verRanking);
+  $("btn-rank-volver").addEventListener("click", function () { mostrar("p-inicio"); });
   $("btn-doc-volver").addEventListener("click", function () { mostrar("p-inicio"); });
   $("btn-doc-entrar").addEventListener("click", entrarDocente);
   $("doc-pin").addEventListener("keydown", function (e) { if (e.key === "Enter") entrarDocente(); });

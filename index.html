@@ -31,6 +31,7 @@
       <p>20 preguntas de opción múltiple sobre cómo usar bien la IA. Cada acierto suma <b>0,5</b>: el <b>10</b> es solo con las 20 correctas. El intento corre en <b>pantalla completa</b>: si salís o cambiás de aplicación, se anula.</p>
     </div>
     <button id="btn-ir-registro" class="btn btn-primario">Registrarse</button>
+    <button id="btn-ranking" class="btn btn-sec">Calificaciones</button>
     <button id="btn-docente" class="link-docente">Acceso docente</button>
   </div>
 </section>
@@ -55,6 +56,8 @@
         <li>Son 20 preguntas, una por pantalla, elegidas al azar.</li>
         <li>Marcás la opción que elijas; podés cambiarla hasta tocar <b>Entregar</b>.</li>
         <li>Nadie te dice si acertaste: la nota se revela solo al final.</li>
+        <li>Podés intentarlo todas las veces que quieras, siempre con preguntas nuevas.</li>
+        <li>Los 5 primeros del ranking en <b>Calificaciones</b> (oro, plata y 3 bronce) se llevan un <b>10 adicional</b>.</li>
         <li>El intento va en pantalla completa. Si salís, se anula.</li>
       </ul>
     </div>
@@ -78,6 +81,7 @@
     </div>
   </header>
   <div class="progreso"><div id="barra-prog"></div><span id="q-contador">Pregunta 1 de 20</span></div>
+  <p class="pista-rank">Top 5 en Calificaciones (oro, plata, 3 bronce) = 10 adicional</p>
   <div class="contenido quiz">
     <div id="q-recurso"></div>
     <p id="q-enunciado" class="enunciado"></p>
@@ -102,7 +106,7 @@
       <p id="r-aprobado" class="badge"></p>
       <p class="tiempo">Tiempo: <b id="r-tiempo">—</b></p>
     </div>
-    <p class="nota-chica">No se muestran las respuestas correctas. Podés reintentar todas las veces que quieras: te van a tocar preguntas nuevas.</p>
+    <p class="nota-chica">No se muestran las respuestas correctas. Podés reintentar todas las veces que quieras: te van a tocar preguntas nuevas. Mirá <b>Calificaciones</b>: el top 5 se lleva un 10 adicional.</p>
     <button id="btn-reintentar" class="btn btn-primario">Intentar de nuevo</button>
   </div>
 </section>
@@ -115,6 +119,21 @@
     <p id="a-motivo" class="motivo">Saliste del intento.</p>
     <p class="nota-chica">La regla del quiz es que se responde sin salir de la app. Quedó registrado. Podés empezar un intento nuevo.</p>
     <button id="btn-recomenzar" class="btn btn-primario">Volver a empezar</button>
+  </div>
+</section>
+
+<!-- ============ PANTALLA 7 · CALIFICACIONES ============ -->
+<section id="p-ranking" class="pantalla">
+  <header class="barra"><h2>Calificaciones</h2><p>Mejor nota de cada estudiante · 5° 1°</p></header>
+  <div class="contenido">
+    <div class="card premio">
+      <svg viewBox="0 0 24 24" class="medalla oro" aria-hidden="true"><path d="M8 2h3.2L12 7l.8-5H16l-2.4 8.4" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="12" cy="15.5" r="6" fill="currentColor"/><path d="M12 12.2l1 2 2.2.3-1.6 1.6.4 2.2-2-1-2 1 .4-2.2-1.6-1.6 2.2-.3z" fill="#fff"/></svg>
+      <p><b>Premio:</b> quienes estén en el top 5 (oro, plata y 3 bronce) reciben un <b>10 adicional</b>. Más aciertos primero; en empate gana el menor tiempo.</p>
+    </div>
+    <div id="rank-podium" class="podium"></div>
+    <div id="rank-lista"></div>
+    <p class="nota-chica">Se actualiza solo: cada intento entregado suma. ¿No estás primero? ¡Todavía podés intentarlo otra vez!</p>
+    <button id="btn-rank-volver" class="btn btn-sec">Volver</button>
   </div>
 </section>
 

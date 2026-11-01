@@ -9,6 +9,7 @@ Investigación en Ciencias Naturales — 5.° año.
 - Nota = aciertos × 0,5. Sin retroalimentación durante el intento.
 - Registro automático de intentos y notas en Google Sheets.
 - Vista docente con PIN y exportación CSV.
+- Botón "Calificaciones" con el ranking público del curso (medallas para el top 5).
 
 **Docente:** seguir [GUIA_DOCENTE.md](GUIA_DOCENTE.md) (Apps Script en
 `apps-script/Code.gs`, conexión en `config.js`).

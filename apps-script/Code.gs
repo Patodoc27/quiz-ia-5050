@@ -2688,5 +2688,36 @@ function doPost(e) {
       nota: it.nota === "" ? null : it.nota, salidas: it.salidas || 0, preguntas: preguntas });
   }
 
+  if (a === "ranking") {
+    // Ranking público: mejor nota de cada estudiante, de mayor a menor.
+    var h = H_INTENTOS();
+    var datos = h.getDataRange().getValues();
+    var mejores = {};
+    for (var i = 1; i < datos.length; i++) {
+      var v = datos[i];
+      if (v[7] !== "entregado") continue;
+      var clave = (String(v[3]) + "|" + String(v[4]) + "|" + String(v[5])).toLowerCase();
+      var nota = v[12] === "" ? 0 : Number(v[12]);
+      if (!mejores[clave] || Number(v[11] || 0) > mejores[clave].correctas ||
+          (Number(v[11] || 0) === mejores[clave].correctas && (v[10] || 999999) < mejores[clave].segundos)) {
+        mejores[clave] = {
+          apellido: v[3], nombre: v[4], curso: v[5], avatar: v[6],
+          correctas: Number(v[11] || 0),
+          nota: nota,
+          segundos: v[10] === "" ? null : v[10],
+          intentos: 0
+        };
+      }
+      mejores[clave].intentos += 1;
+    }
+    var lista = [];
+    for (var k in mejores) lista.push(mejores[k]);
+    lista.sort(function (x, y) {
+      if (y.correctas !== x.correctas) return y.correctas - x.correctas;
+      return (x.segundos || 999999) - (y.segundos || 999999);
+    });
+    return resp_({ ok: true, ranking: lista.slice(0, 50) });
+  }
+
   return resp_({ ok: false, error: "accion-desconocida" });
 }
