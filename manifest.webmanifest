@@ -1,0 +1,12 @@
+{
+  "name": "Cuestionario Final · Colegio 50-50",
+  "short_name": "Quiz 50-50",
+  "start_url": "index.html",
+  "display": "fullscreen",
+  "orientation": "portrait",
+  "background_color": "#1b0f57",
+  "theme_color": "#1b0f57",
+  "icons": [
+    { "src": "avatars/a4.webp", "sizes": "300x300", "type": "image/webp" }
+  ]
+}

@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#1b0f57">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="avatars/a4.webp">
+<title>Cuestionario Final · Colegio 50-50</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- ============ PANTALLA 1 · INICIO ============ -->
+<section id="p-inicio" class="pantalla visible">
+  <div class="hero-wrap">
+    <img src="hero.jpg" alt="Quiz de IA — Ideas Brillantes" class="hero-img">
+    <div class="hero-fade"></div>
+    <div class="hero-txt">
+      <p class="escuela">Colegio 50-50</p>
+      <h1>Cuestionario Final</h1>
+      <p class="sub">Introducción a la Investigación en Ciencias Naturales · 5.° año</p>
+    </div>
+  </div>
+  <div class="contenido">
+    <div class="card aviso">
+      <svg viewBox="0 0 24 24" class="ico"><path d="M12 2a7 7 0 0 0-7 7c0 2.4 1.2 4.2 2.6 5.7.9 1 1.4 1.8 1.4 3.3h6c0-1.5.5-2.3 1.4-3.3C17.8 13.2 19 11.4 19 9a7 7 0 0 0-7-7z" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M9.5 20.5h5M10.5 22.5h3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+      <p>20 preguntas de opción múltiple sobre cómo usar bien la IA. Cada acierto suma <b>0,5</b>: el <b>10</b> es solo con las 20 correctas. El intento corre en <b>pantalla completa</b>: si salís o cambiás de aplicación, se anula.</p>
+    </div>
+    <button id="btn-ir-registro" class="btn btn-primario">Registrarse</button>
+    <button id="btn-docente" class="link-docente">Acceso docente</button>
+  </div>
+</section>
+
+<!-- ============ PANTALLA 2 · REGISTRO ============ -->
+<section id="p-registro" class="pantalla">
+  <header class="barra"><h2>Tu registro</h2><p>Colegio 50-50 · Cuestionario final</p></header>
+  <div class="contenido">
+    <label class="etiqueta">Elegí tu avatar</label>
+    <div id="avatar-grid" class="avatar-grid"></div>
+
+    <label class="etiqueta" for="f-apellido">Apellido/s</label>
+    <input id="f-apellido" class="campo" type="text" autocomplete="off" autocapitalize="words" placeholder="Ej.: Castro">
+    <label class="etiqueta" for="f-nombre">Nombre/s</label>
+    <input id="f-nombre" class="campo" type="text" autocomplete="off" autocapitalize="words" placeholder="Ej.: Patricia">
+    <label class="etiqueta">Curso</label>
+    <div class="campo curso-fijo">5° 1°</div>
+
+    <div class="card reglas">
+      <p><b>Antes de empezar:</b></p>
+      <ul>
+        <li>Son 20 preguntas, una por pantalla, elegidas al azar.</li>
+        <li>Marcás la opción que elijas; podés cambiarla hasta tocar <b>Entregar</b>.</li>
+        <li>Nadie te dice si acertaste: la nota se revela solo al final.</li>
+        <li>El intento va en pantalla completa. Si salís, se anula.</li>
+      </ul>
+    </div>
+    <p id="reg-error" class="error"></p>
+    <button id="btn-comenzar" class="btn btn-primario">Comenzar</button>
+    <button id="btn-volver-inicio" class="link-docente">Volver</button>
+  </div>
+</section>
+
+<!-- ============ PANTALLA 3 · INTENTO ============ -->
+<section id="p-quiz" class="pantalla">
+  <header class="barra barra-quiz">
+    <img id="q-avatar" class="mini-avatar" alt="">
+    <div class="quien">
+      <b id="q-nombre">—</b>
+      <span id="q-curso">5° 1°</span>
+    </div>
+    <div class="datos">
+      <span class="dato">Nota <b id="q-nota">—</b></span>
+      <span class="dato"><svg viewBox="0 0 24 24" class="ico-s"><circle cx="12" cy="13" r="8" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 9.5V13l2.5 1.5M9 3h6" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round"/></svg><b id="q-tiempo">00:00</b></span>
+    </div>
+  </header>
+  <div class="progreso"><div id="barra-prog"></div><span id="q-contador">Pregunta 1 de 20</span></div>
+  <div class="contenido quiz">
+    <div id="q-recurso"></div>
+    <p id="q-enunciado" class="enunciado"></p>
+    <div id="q-opciones"></div>
+  </div>
+  <nav class="navquiz">
+    <button id="btn-anterior" class="btn btn-sec">‹ Anterior</button>
+    <button id="btn-siguiente" class="btn btn-sec">Siguiente ›</button>
+    <button id="btn-entregar" class="btn btn-entregar oculto">Entregar</button>
+  </nav>
+</section>
+
+<!-- ============ PANTALLA 4 · RESULTADO ============ -->
+<section id="p-resultado" class="pantalla">
+  <div class="contenido centrado">
+    <img id="r-avatar" class="avatar-grande" alt="">
+    <h2 id="r-nombre">—</h2>
+    <p class="sub">Cuestionario entregado · 5° 1°</p>
+    <div class="card resultado">
+      <p class="correctas"><b id="r-correctas">0</b><span>/ 20 correctas</span></p>
+      <p class="nota-final">Nota: <b id="r-nota">0</b></p>
+      <p id="r-aprobado" class="badge"></p>
+      <p class="tiempo">Tiempo: <b id="r-tiempo">—</b></p>
+    </div>
+    <p class="nota-chica">No se muestran las respuestas correctas. Podés reintentar todas las veces que quieras: te van a tocar preguntas nuevas.</p>
+    <button id="btn-reintentar" class="btn btn-primario">Intentar de nuevo</button>
+  </div>
+</section>
+
+<!-- ============ PANTALLA 5 · ANULADO ============ -->
+<section id="p-anulado" class="pantalla">
+  <div class="contenido centrado">
+    <svg viewBox="0 0 24 24" class="ico-alerta"><path d="M12 3 2.5 20h19L12 3z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M12 9.5v5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="12" cy="17" r="1.1" fill="currentColor"/></svg>
+    <h2>Intento anulado</h2>
+    <p id="a-motivo" class="motivo">Saliste del cuestionario.</p>
+    <p class="nota-chica">La regla del cuestionario es que se responde sin salir de la app. Quedó registrado. Podés empezar un intento nuevo.</p>
+    <button id="btn-recomenzar" class="btn btn-primario">Volver a empezar</button>
+  </div>
+</section>
+
+<!-- ============ PANTALLA 6 · DOCENTE ============ -->
+<section id="p-docente" class="pantalla">
+  <header class="barra"><h2>Vista docente</h2><p>Cuestionario Final · 5° 1°</p></header>
+  <div class="contenido" id="doc-login">
+    <label class="etiqueta" for="doc-pin">Contraseña</label>
+    <input id="doc-pin" class="campo" type="password" inputmode="numeric" placeholder="PIN docente">
+    <p id="doc-error" class="error"></p>
+    <button id="btn-doc-entrar" class="btn btn-primario">Entrar</button>
+    <button id="btn-doc-volver" class="link-docente">Volver al inicio</button>
+  </div>
+  <div class="contenido oculto" id="doc-panel">
+    <div class="panel-acciones">
+      <button id="btn-csv" class="btn btn-sec chico">Exportar CSV</button>
+      <button id="btn-doc-actualizar" class="btn btn-sec chico">Actualizar</button>
+    </div>
+    <div id="doc-tabla"></div>
+    <div id="doc-detalle" class="oculto"></div>
+  </div>
+</section>
+
+<!-- Modal confirmar entrega -->
+<div id="modal" class="modal oculto">
+  <div class="modal-card">
+    <h3 id="m-titulo">¿Entregar el cuestionario?</h3>
+    <p id="m-texto"></p>
+    <div class="modal-btns">
+      <button id="m-cancelar" class="btn btn-sec">Seguir respondiendo</button>
+      <button id="m-confirmar" class="btn btn-entregar">Entregar</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="toast oculto"></div>
+
+<script src="data.js"></script>
+<script src="config.js"></script>
+<script src="sorteo.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
