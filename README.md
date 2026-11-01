@@ -1,4 +1,4 @@
-# Cuestionario Final · Colegio 50-50
+# Quiz de IA · Ideas Brillantes — Colegio 50-50
 
 Cuestionario móvil anti-trampa (Android / iPhone) sobre Introducción a la
 Investigación en Ciencias Naturales — 5.° año.

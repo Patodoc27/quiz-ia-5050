@@ -419,7 +419,7 @@ function entregar() {
     $("m-titulo").textContent = "Te quedan " + sin + " sin responder";
     $("m-texto").textContent = "Podés volver con Anterior para revisarlas. Si entregás igual, cuentan como incorrectas. ¿Entregar de todas formas?";
   } else {
-    $("m-titulo").textContent = "¿Entregar el cuestionario?";
+    $("m-titulo").textContent = "¿Entregar el quiz?";
     $("m-texto").textContent = "Después de entregar no podés cambiar respuestas. Recién ahí vas a ver tu nota.";
   }
   $("modal").classList.remove("oculto");
@@ -546,7 +546,7 @@ function exportarCSV() {
     var blob = new Blob(["﻿" + csv], { type: "text/csv;charset=utf-8" });
     var a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
-    a.download = "cuestionario-5050-" + new Date().toISOString().slice(0, 10) + ".csv";
+    a.download = "quiz-ia-5050-" + new Date().toISOString().slice(0, 10) + ".csv";
     document.body.appendChild(a); a.click(); document.body.removeChild(a);
   }).catch(function () { toast("Sin conexión."); });
 }
@@ -613,7 +613,7 @@ function init() {
     $("reg-error").textContent = "";
     estado.apellido = ap; estado.nombre = no;
     var btn = $("btn-comenzar"); btn.disabled = true; btn.textContent = "Preparando…";
-    leerVoz("Hola " + no + ". Este es el cuestionario final. Son veinte preguntas y cada acierto suma medio punto. La pantalla se va a poner en modo completa: si salís o cambiás de aplicación, el intento se anula y tenés que volver a registrarte. No se muestran las respuestas correctas: la nota aparece solo al entregar. ¡Suerte!");
+    leerVoz("Hola " + no + ". Este es el quiz de IA, Ideas Brillantes. Son veinte preguntas y cada acierto suma medio punto. La pantalla se va a poner en modo completa: si salís o cambiás de aplicación, el intento se anula y tenés que volver a registrarte. No se muestran las respuestas correctas: la nota aparece solo al entregar. ¡Suerte!");
     var paso = estado.studentId ? Promise.resolve({ ok: true }) :
       api({ action: "registrar", deviceId: estado.deviceId, apellido: ap, nombre: no, curso: CURSO_FIJO, avatar: estado.avatar })
         .then(function (r) { if (r && r.ok) { estado.studentId = r.studentId; guardarLS(); return r; } throw new Error((r && r.error) || "fallo-registro"); });

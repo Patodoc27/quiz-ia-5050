@@ -1,4 +1,4 @@
-# Guía docente — Cuestionario Final · Colegio 50-50
+# Quiz de IA · Ideas Brillantes — Colegio 50-50
 
 ## Qué hace la app
 - Registro con avatar, apellido, nombre y curso (fijo: 5° 1°).

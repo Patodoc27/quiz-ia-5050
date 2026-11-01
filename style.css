@@ -40,6 +40,8 @@ input, textarea { -webkit-user-select: text; user-select: text; }
 .hero-txt h1 { font-size: 34px; font-weight: 800; margin: 4px 0 2px;
   text-shadow: 0 0 18px rgba(217,70,239,.55); }
 .hero-txt .sub { font-size: 13px; color: #d9ccff; }
+.hero-txt .sub2 { font-size: 16px; font-weight: 700; color: #8be9ff; letter-spacing: 1px; margin: 0 0 4px;
+  text-shadow: 0 0 10px rgba(25,184,216,.55); }
 
 .card { background: var(--card); border: 1px solid var(--borde); border-radius: 16px;
   padding: 14px 16px; box-shadow: 0 4px 18px rgba(76,47,216,.08); }

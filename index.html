@@ -8,7 +8,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="avatars/a4.webp">
-<title>Cuestionario Final · Colegio 50-50</title>
+<title>Quiz de IA · Ideas Brillantes — Colegio 50-50</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -20,7 +20,8 @@
     <div class="hero-fade"></div>
     <div class="hero-txt">
       <p class="escuela">Colegio 50-50</p>
-      <h1>Cuestionario Final</h1>
+      <h1>Quiz de IA</h1>
+      <p class="sub2">Ideas Brillantes</p>
       <p class="sub">Introducción a la Investigación en Ciencias Naturales · 5.° año</p>
     </div>
   </div>
@@ -36,7 +37,7 @@
 
 <!-- ============ PANTALLA 2 · REGISTRO ============ -->
 <section id="p-registro" class="pantalla">
-  <header class="barra"><h2>Tu registro</h2><p>Colegio 50-50 · Cuestionario final</p></header>
+  <header class="barra"><h2>Tu registro</h2><p>Colegio 50-50 · Quiz de IA</p></header>
   <div class="contenido">
     <label class="etiqueta">Elegí tu avatar</label>
     <div id="avatar-grid" class="avatar-grid"></div>
@@ -94,7 +95,7 @@
   <div class="contenido centrado">
     <img id="r-avatar" class="avatar-grande" alt="">
     <h2 id="r-nombre">—</h2>
-    <p class="sub">Cuestionario entregado · 5° 1°</p>
+    <p class="sub">Quiz entregado · 5° 1°</p>
     <div class="card resultado">
       <p class="correctas"><b id="r-correctas">0</b><span>/ 20 correctas</span></p>
       <p class="nota-final">Nota: <b id="r-nota">0</b></p>
@@ -111,15 +112,15 @@
   <div class="contenido centrado">
     <svg viewBox="0 0 24 24" class="ico-alerta"><path d="M12 3 2.5 20h19L12 3z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M12 9.5v5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="12" cy="17" r="1.1" fill="currentColor"/></svg>
     <h2>Intento anulado</h2>
-    <p id="a-motivo" class="motivo">Saliste del cuestionario.</p>
-    <p class="nota-chica">La regla del cuestionario es que se responde sin salir de la app. Quedó registrado. Podés empezar un intento nuevo.</p>
+    <p id="a-motivo" class="motivo">Saliste del intento.</p>
+    <p class="nota-chica">La regla del quiz es que se responde sin salir de la app. Quedó registrado. Podés empezar un intento nuevo.</p>
     <button id="btn-recomenzar" class="btn btn-primario">Volver a empezar</button>
   </div>
 </section>
 
 <!-- ============ PANTALLA 6 · DOCENTE ============ -->
 <section id="p-docente" class="pantalla">
-  <header class="barra"><h2>Vista docente</h2><p>Cuestionario Final · 5° 1°</p></header>
+  <header class="barra"><h2>Vista docente</h2><p>Quiz de IA · 5° 1°</p></header>
   <div class="contenido" id="doc-login">
     <label class="etiqueta" for="doc-pin">Contraseña</label>
     <input id="doc-pin" class="campo" type="password" inputmode="numeric" placeholder="PIN docente">
@@ -140,7 +141,7 @@
 <!-- Modal confirmar entrega -->
 <div id="modal" class="modal oculto">
   <div class="modal-card">
-    <h3 id="m-titulo">¿Entregar el cuestionario?</h3>
+    <h3 id="m-titulo">¿Entregar el quiz?</h3>
     <p id="m-texto"></p>
     <div class="modal-btns">
       <button id="m-cancelar" class="btn btn-sec">Seguir respondiendo</button>
