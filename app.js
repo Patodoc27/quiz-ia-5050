@@ -553,6 +553,11 @@ function exportarCSV() {
 
 /* ====== arranque ====== */
 /* ====== ranking público ====== */
+function capitalizar_(s) {
+  return String(s || "").toLowerCase().replace(/(^|\s)(\S)/g, function (m, esp, c) {
+    return esp + c.toUpperCase();
+  });
+}
 /* Medallas: oro (1°), plata (2°), bronce (3° a 5°). Esos cinco ganan el 10 adicional. */
 function medallaSVG(clase) {
   return '<svg viewBox="0 0 24 24" class="medalla ' + clase + '" aria-hidden="true">' +
@@ -579,7 +584,7 @@ function verRanking() {
       av.src = AVATARES[e.avatar] || AVATARES[0];
       av.alt = ""; f.appendChild(av);
       var datos = el("span", "rank-datos");
-      datos.appendChild(el("b", "", e.apellido + ", " + e.nombre));
+      datos.appendChild(el("b", "", capitalizar_(e.nombre) + " " + capitalizar_(e.apellido)));
       datos.appendChild(el("small", "", e.curso + " · " + e.correctas + " aciertos · " + fmtTiempo(e.segundos || 0) +
         " · " + (e.intentos || 1) + " intento" + ((e.intentos || 1) === 1 ? "" : "s")));
       f.appendChild(datos);

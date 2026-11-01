@@ -12,6 +12,11 @@
 
 var SPREADSHEET_ID = "PEGAR_ID_DE_TU_PLANILLA";
 var PIN_DOCENTE = "PEGAR_PIN_DOCENTE";
+/* Si sabés el nombre de la pestaña donde está la lista de estudiantes,
+   escribilo acá (ej: "5° 1°"). Dejado vacío, busca la columna
+   CUESTIONARIO VIRTUAL en todas las pestañas. */
+var HOJA_REGISTRO = "";
+var ENCABEZADO_CUESTIONARIO = "CUESTIONARIO";
 var TOTAL_PREGUNTAS = 20;
 var NOTA_APROBADO = 6;
 
@@ -2503,6 +2508,107 @@ function buscarFilaEnCol_(h, col, val) {
   return -1;
 }
 
+/* Escribe la MEJOR nota del estudiante en la columna CUESTIONARIO VIRTUAL
+   de la planilla de registro. Reconoce al estudiante aunque haya puesto
+   solo un nombre o un solo apellido: gana la fila con más coincidencias;
+   si hay empate ambiguo no escribe (el intento queda en "Notas" igual). */
+function norm_(s) {
+  return String(s == null ? "" : s).toLowerCase()
+    .normalize("NFD").replace(/[̀-ͯ]/g, "")
+    .replace(/[^a-z0-9 ]/g, " ").replace(/\s+/g, " ").trim();
+}
+function tokens_(s) {
+  var n = norm_(s);
+  return n ? n.split(" ") : [];
+}
+function distancia_(a, b) { /* Levenshtein acotado */
+  if (Math.abs(a.length - b.length) > 2) return 99;
+  var prev = [], cur = [], i, j;
+  for (j = 0; j <= b.length; j++) prev[j] = j;
+  for (i = 1; i <= a.length; i++) {
+    cur[0] = i;
+    for (j = 1; j <= b.length; j++)
+      cur[j] = Math.min(prev[j] + 1, cur[j - 1] + 1,
+        prev[j - 1] + (a.charAt(i - 1) === b.charAt(j - 1) ? 0 : 1));
+    var tmp = prev; prev = cur; cur = tmp;
+  }
+  return prev[b.length];
+}
+/* Nivel de coincidencia entre lo que escribió y un token de la fila:
+   2 = exacto/prefijo/sufijo (ej. "erez" en "pérez"), 1 = un error de
+   tipeo (2 si la palabra es larga), 0 = no coincide. */
+function nivelToken_(filaTok, t) {
+  if (filaTok === t || filaTok.indexOf(t) === 0 || t.indexOf(filaTok) === 0 ||
+      filaTok.indexOf(t) >= 0) return 2;
+  var d = distancia_(filaTok, t);
+  var tol = Math.max(filaTok.length, t.length) >= 7 ? 2 : 1;
+  return d <= tol ? 1 : 0;
+}
+function puntajeFila_(filaTokens, buscado) {
+  var score = 0;
+  for (var k = 0; k < buscado.length; k++) {
+    var n = 0;
+    for (var i = 0; i < filaTokens.length; i++) {
+      var nv = nivelToken_(filaTokens[i], buscado[k]);
+      if (nv > n) n = nv;
+    }
+    if (n === 0) return -1; /* un token no coincide con nada */
+    score += n;
+  }
+  return score;
+}
+function escribirMejorNota_(it) {
+  if (it.estado !== "entregado" || it.nota === "" || it.nota === null) return false;
+  var ss = ss_();
+  var hojas = HOJA_REGISTRO ? [ss.getSheetByName(HOJA_REGISTRO)] : ss.getSheets();
+  var propias = { "intentos": 1, "notas": 1, "estudiantes": 1 };
+  var buscado = tokens_(it.apellido + " " + it.nombre);
+  for (var s = 0; s < hojas.length; s++) {
+    var h = hojas[s];
+    if (!h || propias[norm_(h.getName())]) continue;
+    var datos = h.getDataRange().getValues();
+    var filaEnc = -1, colCuest = -1;
+    for (var i = 0; i < Math.min(datos.length, 15); i++) {
+      for (var j = 0; j < datos[i].length; j++) {
+        if (norm_(datos[i][j]).indexOf(ENCABEZADO_CUESTIONARIO.toLowerCase()) === 0) {
+          filaEnc = i; colCuest = j; break;
+        }
+      }
+      if (filaEnc >= 0) break;
+    }
+    if (filaEnc < 0) continue;
+    var colApe = -1, colNom = -1;
+    for (var j2 = 0; j2 < datos[filaEnc].length; j2++) {
+      var t2 = norm_(datos[filaEnc][j2]);
+      if (t2.indexOf("apellido") >= 0) colApe = j2;
+      else if (t2.indexOf("nombre") >= 0) colNom = j2;
+    }
+    var mejor = -1, mejorScore = 0, empate = false;
+    for (var r = filaEnc + 1; r < datos.length; r++) {
+      var filaTxt = "";
+      if (colApe >= 0) filaTxt += " " + datos[r][colApe];
+      if (colNom >= 0) filaTxt += " " + datos[r][colNom];
+      if (colApe < 0 && colNom < 0) continue;
+      var filaTokens = tokens_(filaTxt);
+      if (!filaTokens.length) continue;
+      var score = puntajeFila_(filaTokens, buscado);
+      if (score < 0) continue;
+      if (score > mejorScore) { mejor = r; mejorScore = score; empate = false; }
+      else if (score === mejorScore) empate = true;
+    }
+    if (mejor < 0 || empate) continue;
+    var actual = datos[mejor][colCuest];
+    var actualN = actual === "" || actual === null ? -1 : Number(String(actual).replace(",", "."));
+    if (isNaN(actualN)) actualN = -1;
+    if (Number(it.nota) > actualN) {
+      h.getRange(mejor + 1, colCuest + 1).setValue(it.nota);
+      return true;
+    }
+    return false; /* ya tenía nota igual o mejor */
+  }
+  return false;
+}
+
 function resp_(obj) {
   return ContentService.createTextOutput(JSON.stringify(obj))
     .setMimeType(ContentService.MimeType.JSON);
@@ -2636,6 +2742,7 @@ function doPost(e) {
       it.estado = "entregado"; it.fin = fin; it.segundos = segundos;
       it.correctas = correctas; it.nota = nota;
       upsertNota_(it);
+      escribirMejorNota_(it);
       return resp_({ ok: true, correctas: correctas, nota: nota,
         segundos: segundos, aprobado: nota >= NOTA_APROBADO });
     });

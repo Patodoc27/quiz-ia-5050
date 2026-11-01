@@ -24,6 +24,9 @@
 3. Arriba del archivo, en las constantes, completá:
    - `SPREADSHEET_ID`: el ID copiado en el paso 1.
    - `PIN_DOCENTE`: el PIN que quieras para tu vista docente.
+   - `HOJA_REGISTRO` (opcional): el nombre de la pestaña donde está tu lista
+     de estudiantes con la columna **CUESTIONARIO VIRTUAL** (ej: `"5° 1°"`).
+     Dejado vacío, la busca en todas las pestañas.
 4. **Implementar → Nueva implementación → tipo: Aplicación web**:
    - "Ejecutar como": **Yo**
    - "Quién puede acceder": **Cualquier persona**
@@ -41,6 +44,10 @@
   exportar CSV.
 
 ## Cómo quedan las hojas en tu planilla
+- **Tu hoja de registro**: en la columna **CUESTIONARIO VIRTUAL** se escribe
+  automáticamente la **mejor nota** de cada estudiante (se sube si se supera,
+  nunca se baja). Lo ubica por apellido y nombre, aunque ponga un solo
+  apellido, le falte una letra, le sobren espacios o no use acentos.
 - **Intentos**: una fila por intento (fecha, estudiante, items, respuestas, eventos, estado).
 - **Notas**: una fila por intento entregado (nota, correctas, tiempo, estado).
 - **Estudiantes**: registro de cada dispositivo/nombre.
