@@ -2450,6 +2450,12 @@ function equilibrar_(items) {
 
 /* ---------- hojas ---------- */
 function ss_() { return SpreadsheetApp.openById(SPREADSHEET_ID); }
+/* Ejecutar ESTA función una vez desde el editor (▶ Ejecutar) para que
+   Google muestre el cartel de autorización y el script pueda escribir
+   en la planilla. Después de autorizar, el despliegue funciona solo. */
+function autorizar() {
+  return ss_().getName();
+}
 function hoja_(nombre, encabezados) {
   var ss = ss_();
   var h = ss.getSheetByName(nombre);
