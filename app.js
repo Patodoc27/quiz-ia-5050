@@ -628,7 +628,7 @@ function init() {
         toast("Sin conexión: no se puede retomar el intento.");
       });
     });
-    $("p-inicio").querySelector(".contenido").appendChild(btn);
+    $("p-inicio").querySelector(".hero-acciones").insertBefore(btn, $("btn-docente"));
   } else if (guardado.attemptId && guardado.anulado && !guardado.entregado) {
     limpiarIntentoLS();
   }

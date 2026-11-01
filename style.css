@@ -29,19 +29,31 @@ input, textarea { -webkit-user-select: text; user-select: text; }
 .contenido.centrado { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 12px; }
 .oculto { display: none !important; }
 
-/* ---------- inicio ---------- */
-.hero-wrap { position: relative; overflow: hidden;
-  border-radius: 0 0 28px 28px; }
-.hero-img { width: 100%; height: auto; object-fit: contain; display: block; }
-.hero-fade { position: absolute; inset: 0;
-  background: linear-gradient(180deg, rgba(15,6,60,0) 55%, rgba(21,10,80,.55) 92%); }
-.hero-txt { position: absolute; left: 0; right: 0; top: 33%; text-align: center; color: #fff; }
+/* ---------- inicio: póster a pantalla completa ---------- */
+#p-inicio { position: relative; }
+.hero-img { position: absolute; inset: 0; width: 100%; height: 100%;
+  object-fit: cover; object-position: center 40%; display: block; }
+.hero-overlay { position: relative; z-index: 2; min-height: 100dvh; display: flex;
+  flex-direction: column; }
+.hero-txt { margin-top: 30dvh; text-align: center; color: #fff; padding: 0 24px;
+  text-shadow: 0 2px 14px rgba(15,6,60,.9); }
+.hero-acciones { margin-top: auto; margin-bottom: calc(26px + env(safe-area-inset-bottom));
+  padding: 14px 20px 0; max-width: 420px; width: 100%; margin-left: auto; margin-right: auto;
+  display: flex; flex-direction: column; gap: 10px;
+  background: linear-gradient(180deg, rgba(15,6,60,0) 0%, rgba(15,6,60,.55) 26%, rgba(15,6,60,.75) 100%);
+  border-radius: 24px 24px 0 0; padding-top: 34px; }
+.hero-mini { text-align: center; font-size: 12.5px; color: #d9ccff; margin: -16px 0 4px;
+  text-shadow: 0 1px 8px rgba(0,0,0,.7); }
 .escuela { font-size: 13px; letter-spacing: 3px; text-transform: uppercase; color: #8be9ff; font-weight: 600; }
 .hero-txt h1 { font-size: 34px; font-weight: 800; margin: 4px 0 2px;
   text-shadow: 0 0 18px rgba(217,70,239,.55); }
 .hero-txt .sub { font-size: 13px; color: #d9ccff; }
 .hero-txt .sub2 { font-size: 16px; font-weight: 700; color: #8be9ff; letter-spacing: 1px; margin: 0 0 4px;
   text-shadow: 0 0 10px rgba(25,184,216,.55); }
+.hero-acciones .btn-sec { background: rgba(255,255,255,.14); color: #fff;
+  border: 1.5px solid rgba(255,255,255,.45); backdrop-filter: blur(4px); }
+.hero-acciones .link-docente { color: #d9ccff; text-align: center; background: none;
+  border: 0; padding: 8px; font-size: 13px; text-decoration: underline; }
 
 .card { background: var(--card); border: 1px solid var(--borde); border-radius: 16px;
   padding: 14px 16px; box-shadow: 0 4px 18px rgba(76,47,216,.08); }
