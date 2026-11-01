@@ -5,7 +5,7 @@
  *   1. Pegar el ID de la planilla en SPREADSHEET_ID y el PIN en PIN_DOCENTE.
  *   2. Implementar → Nueva implementación → Aplicación web.
  *      Ejecutar como: Yo. Acceso: Cualquier persona.
- *   3. Pegar la URL /exec en API_URL de app.js.
+ *   3. Pegar la URL /exec en API_URL de config.js.
  *   Para editar el código después: Administrar implementaciones → lápiz →
  *   Nueva versión (la URL /exec no cambia).
  * ============================================================ */
