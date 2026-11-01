@@ -2575,7 +2575,7 @@ function encontrarRegistro_() {
         else if (t.indexOf("pasapalabra") >= 0) colPasap = j;
         else if (t.indexOf("mejor") === 0 && t.indexOf("desempen") >= 0) colDesemp = j;
         else if (t.indexOf("apellido") >= 0) colApe = j;
-        else if (t.indexOf("nombre") >= 0) colNom = j2(j);
+        else if (t.indexOf("nombre") >= 0) colNom = j;
       }
       if (colCuest >= 0)
         return { h: h, filaEnc: i, datos: datos,
