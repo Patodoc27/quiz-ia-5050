@@ -94,21 +94,27 @@ function limpiarIntentoLS() {
 /* ====== voz ====== */
 var vozOn = true;
 function leerVoz(texto) {
-  if (!vozOn || !("speechSynthesis" in window)) return;
-  try {
-    speechSynthesis.cancel();
-    var u = new SpeechSynthesisUtterance(texto);
-    u.lang = "es-MX";
-    var voces = speechSynthesis.getVoices();
-    var v = null;
-    for (var i = 0; i < voces.length; i++) {
-      if (/es[-_](MX|US|419|AR|LATAM)/i.test(voces[i].lang)) { v = voces[i]; break; }
-    }
-    if (!v) for (var j = 0; j < voces.length; j++) { if (/^es/i.test(voces[j].lang)) { v = voces[j]; break; } }
-    if (v) u.voice = v;
-    u.rate = 1.0;
-    speechSynthesis.speak(u);
-  } catch (e) {}
+  if (!vozOn || !("speechSynthesis" in window)) return Promise.resolve();
+  return new Promise(function (res) {
+    try {
+      speechSynthesis.cancel();
+      var u = new SpeechSynthesisUtterance(texto);
+      u.lang = "es-MX";
+      var voces = speechSynthesis.getVoices();
+      var v = null;
+      for (var i = 0; i < voces.length; i++) {
+        if (/es[-_](MX|US|419|AR|LATAM)/i.test(voces[i].lang)) { v = voces[i]; break; }
+      }
+      if (!v) for (var j = 0; j < voces.length; j++) { if (/^es/i.test(voces[j].lang)) { v = voces[j]; break; } }
+      if (v) u.voice = v;
+      u.rate = 1.0;
+      u.onend = function () { res(); };
+      u.onerror = function () { res(); };
+      /* guardia: si el evento no llega, liberar igual (el texto dura <~40s) */
+      setTimeout(res, 45000);
+      speechSynthesis.speak(u);
+    } catch (e) { res(); }
+  });
 }
 if ("speechSynthesis" in window) {
   speechSynthesis.getVoices();
@@ -439,7 +445,7 @@ function confirmarEntrega() {
       try { document.exitFullscreen(); } catch (e) {}
     }
     clearInterval(timerInt);
-    var nota = Math.round(r.correctas * 0.5 * 100) / 100;
+    var nota = Math.floor(r.correctas * 0.5);
     $("r-avatar").src = AVATARES[estado.avatar];
     $("r-nombre").textContent = nombreCompleto();
     $("r-correctas").textContent = r.correctas;
@@ -661,21 +667,29 @@ function init() {
     if (!ap || !no) { $("reg-error").textContent = "Completá apellido y nombre."; return; }
     $("reg-error").textContent = "";
     estado.apellido = ap; estado.nombre = no;
-    var btn = $("btn-comenzar"); btn.disabled = true; btn.textContent = "Preparando…";
-    leerVoz("Hola " + no + ". Este es el quiz de IA, Ideas Brillantes. Son veinte preguntas y cada acierto suma medio punto. La pantalla se va a poner en modo completa: si salís o cambiás de aplicación, el intento se anula y tenés que volver a registrarte. No se muestran las respuestas correctas: la nota aparece solo al entregar. ¡Suerte!");
+    var btn = $("btn-comenzar"); btn.disabled = true; btn.textContent = "Escuchá las reglas…";
+    /* El audio de reglas se reproduce primero; el intento se prepara en
+       paralelo pero solo se entra al quiz cuando termina de hablar, así
+       no queda sonando mientras se responde. */
+    var voz = leerVoz("Hola " + no + ". Este es el quiz de IA, Ideas Brillantes. Son veinte preguntas y cada acierto suma medio punto. La pantalla se va a poner en modo completa: si salís o cambiás de aplicación, el intento se anula y tenés que volver a registrarte. No se muestran las respuestas correctas: la nota aparece solo al entregar. ¡Suerte!");
     var paso = estado.studentId ? Promise.resolve({ ok: true }) :
       api({ action: "registrar", deviceId: estado.deviceId, apellido: ap, nombre: no, curso: CURSO_FIJO, avatar: estado.avatar })
         .then(function (r) { if (r && r.ok) { estado.studentId = r.studentId; guardarLS(); return r; } throw new Error((r && r.error) || "fallo-registro"); });
+    var fallo = null;
     paso.then(function () {
       return nuevoIntento();
     }).then(function () {
       return pedirFullscreen();
+    }).catch(function (e) { fallo = e; }).then(function () {
+      return voz;
     }).then(function () {
+      if (fallo) {
+        btn.disabled = false; btn.textContent = "Comenzar";
+        $("reg-error").textContent = "No se pudo iniciar el intento. Revisá tu conexión y probá de nuevo.";
+        return;
+      }
       entrarQuiz();
       btn.disabled = false; btn.textContent = "Comenzar";
-    }).catch(function (e) {
-      btn.disabled = false; btn.textContent = "Comenzar";
-      $("reg-error").textContent = "No se pudo iniciar el intento. Revisá tu conexión y probá de nuevo.";
     });
   });
 
