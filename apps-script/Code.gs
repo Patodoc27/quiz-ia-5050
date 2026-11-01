@@ -2630,8 +2630,10 @@ function escribirMejorNota_(it) {
    (ranking.gs de pasapalabra-ia), no el quiz: queda sin uso aquí. */
 
 /* MEJOR DESEMPEÑO DE ACTIVIDADES VIRTUALES: 10 para el top 5 del ranking
-   (más aciertos en su mejor intento; en empate, menor tiempo). Si sale
-   del top 5, se borra el 10 que le correspondía. */
+   del quiz O del pasapalabra (unión; si está en los dos, un solo 10).
+   Se actualiza en cada entrega: entra y sale del top 5 dinámicamente.
+   El top 5 del pasapalabra lo mantiene la otra app en la hoja
+   "PasapalabraResumen" de esta misma planilla. */
 function mejorIntentoPorEstudiante_() {
   var h = H_INTENTOS();
   var datos = h.getDataRange().getValues();
@@ -2653,26 +2655,50 @@ function mejorIntentoPorEstudiante_() {
   });
   return lista;
 }
+/* Top 5 del pasapalabra: lo mantiene la otra app en la hoja
+   "PasapalabraResumen" (nombre + aciertos acumulados). */
+function pasapResumen_() {
+  var h = ss_().getSheetByName("PasapalabraResumen");
+  if (!h) return [];
+  var datos = h.getDataRange().getValues();
+  var lista = [];
+  for (var i = 1; i < datos.length; i++)
+    lista.push({ nombre: String(datos[i][0] || ""), aciertos: Number(datos[i][1] || 0) });
+  lista.sort(function (a, b) {
+    return b.aciertos - a.aciertos || (a.nombre < b.nombre ? -1 : a.nombre > b.nombre ? 1 : 0);
+  });
+  return lista;
+}
 function actualizarTop5_() {
   var reg = encontrarRegistro_();
   if (!reg || reg.colDesemp < 0) return;
-  var top5 = mejorIntentoPorEstudiante_().slice(0, 5);
-  var enTop = {};
-  top5.forEach(function (e) { enTop[(e.apellido + "|" + e.nombre).toLowerCase()] = 1; });
-  /* recorro los estudiantes con intentos: top5 -> 10, el resto -> borrar 10 */
-  var h = H_INTENTOS();
-  var datos = h.getDataRange().getValues();
-  var vistos = {};
+  /* filas que merecen 10: unión del top 5 del quiz y del pasapalabra */
+  var merecen = {};
+  mejorIntentoPorEstudiante_().slice(0, 5).forEach(function (e) {
+    var f = filaDeEstudiante_(reg, e.apellido, e.nombre);
+    if (f >= 0) merecen[f] = 1;
+  });
+  pasapResumen_().slice(0, 5).forEach(function (e) {
+    var f = filaDeEstudiante_(reg, "", e.nombre);
+    if (f >= 0) merecen[f] = 1;
+  });
+  /* filas con actividad registrada en cualquiera de las dos apps */
+  var activas = {};
+  var datos = H_INTENTOS().getDataRange().getValues();
   for (var i = 1; i < datos.length; i++) {
     if (datos[i][7] !== "entregado") continue;
-    var clave = (String(datos[i][3]) + "|" + String(datos[i][4])).toLowerCase();
-    if (vistos[clave]) continue;
-    vistos[clave] = 1;
     var f = filaDeEstudiante_(reg, datos[i][3], datos[i][4]);
-    if (f < 0) continue;
-    var celda = reg.h.getRange(f + 1, reg.colDesemp + 1);
-    if (enTop[clave]) { if (numNota_(reg.datos[f][reg.colDesemp]) !== 10) celda.setValue(10); }
-    else if (numNota_(reg.datos[f][reg.colDesemp]) === 10) celda.setValue("");
+    if (f >= 0) activas[f] = 1;
+  }
+  pasapResumen_().forEach(function (e) {
+    var f = filaDeEstudiante_(reg, "", e.nombre);
+    if (f >= 0) activas[f] = 1;
+  });
+  for (var fr in activas) {
+    var fila = Number(fr);
+    var celda = reg.h.getRange(fila + 1, reg.colDesemp + 1);
+    if (merecen[fila]) { if (numNota_(reg.datos[fila][reg.colDesemp]) !== 10) celda.setValue(10); }
+    else if (numNota_(reg.datos[fila][reg.colDesemp]) === 10) celda.setValue("");
   }
 }
 
