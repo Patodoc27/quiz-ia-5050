@@ -35,7 +35,9 @@ input, textarea { -webkit-user-select: text; user-select: text; }
   object-fit: cover; object-position: center 40%; display: block; }
 .hero-overlay { position: relative; z-index: 2; min-height: 100dvh; display: flex;
   flex-direction: column; }
-.hero-txt { margin-top: 30dvh; text-align: center; color: #fff; padding: 0 24px;
+.escudo { width: 110px; height: auto; margin: 0 auto 10px; display: block;
+  filter: drop-shadow(0 3px 10px rgba(15,6,60,.8)); }
+.hero-txt { margin-top: 16dvh; text-align: center; color: #fff; padding: 0 24px;
   text-shadow: 0 2px 14px rgba(15,6,60,.9); }
 .hero-acciones { margin-top: auto; margin-bottom: calc(26px + env(safe-area-inset-bottom));
   padding: 14px 20px 0; max-width: 420px; width: 100%; margin-left: auto; margin-right: auto;
