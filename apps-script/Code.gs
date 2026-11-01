@@ -2557,56 +2557,123 @@ function puntajeFila_(filaTokens, buscado) {
   }
   return score;
 }
-function escribirMejorNota_(it) {
-  if (it.estado !== "entregado" || it.nota === "" || it.nota === null) return false;
+/* Busca la hoja de registro (la que tiene la columna CUESTIONARIO VIRTUAL)
+   y detecta las columnas de estudiante y de cada nota automática. */
+function encontrarRegistro_() {
   var ss = ss_();
   var hojas = HOJA_REGISTRO ? [ss.getSheetByName(HOJA_REGISTRO)] : ss.getSheets();
   var propias = { "intentos": 1, "notas": 1, "estudiantes": 1 };
-  var buscado = tokens_(it.apellido + " " + it.nombre);
   for (var s = 0; s < hojas.length; s++) {
     var h = hojas[s];
     if (!h || propias[norm_(h.getName())]) continue;
     var datos = h.getDataRange().getValues();
-    var filaEnc = -1, colCuest = -1;
     for (var i = 0; i < Math.min(datos.length, 15); i++) {
+      var colCuest = -1, colPasap = -1, colDesemp = -1, colApe = -1, colNom = -1;
       for (var j = 0; j < datos[i].length; j++) {
-        if (norm_(datos[i][j]).indexOf(ENCABEZADO_CUESTIONARIO.toLowerCase()) === 0) {
-          filaEnc = i; colCuest = j; break;
-        }
+        var t = norm_(datos[i][j]);
+        if (t.indexOf("cuestionario") === 0) colCuest = j;
+        else if (t.indexOf("pasapalabra") >= 0) colPasap = j;
+        else if (t.indexOf("mejor") === 0 && t.indexOf("desempen") >= 0) colDesemp = j;
+        else if (t.indexOf("apellido") >= 0) colApe = j;
+        else if (t.indexOf("nombre") >= 0) colNom = j2(j);
       }
-      if (filaEnc >= 0) break;
+      if (colCuest >= 0)
+        return { h: h, filaEnc: i, datos: datos,
+          colCuest: colCuest, colPasap: colPasap, colDesemp: colDesemp,
+          colApe: colApe, colNom: colNom };
     }
-    if (filaEnc < 0) continue;
-    var colApe = -1, colNom = -1;
-    for (var j2 = 0; j2 < datos[filaEnc].length; j2++) {
-      var t2 = norm_(datos[filaEnc][j2]);
-      if (t2.indexOf("apellido") >= 0) colApe = j2;
-      else if (t2.indexOf("nombre") >= 0) colNom = j2;
-    }
-    var mejor = -1, mejorScore = 0, empate = false;
-    for (var r = filaEnc + 1; r < datos.length; r++) {
-      var filaTxt = "";
-      if (colApe >= 0) filaTxt += " " + datos[r][colApe];
-      if (colNom >= 0) filaTxt += " " + datos[r][colNom];
-      if (colApe < 0 && colNom < 0) continue;
-      var filaTokens = tokens_(filaTxt);
-      if (!filaTokens.length) continue;
-      var score = puntajeFila_(filaTokens, buscado);
-      if (score < 0) continue;
-      if (score > mejorScore) { mejor = r; mejorScore = score; empate = false; }
-      else if (score === mejorScore) empate = true;
-    }
-    if (mejor < 0 || empate) continue;
-    var actual = datos[mejor][colCuest];
-    var actualN = actual === "" || actual === null ? -1 : Number(String(actual).replace(",", "."));
-    if (isNaN(actualN)) actualN = -1;
-    if (Number(it.nota) > actualN) {
-      h.getRange(mejor + 1, colCuest + 1).setValue(it.nota);
-      return true;
-    }
-    return false; /* ya tenía nota igual o mejor */
+  }
+  return null;
+}
+/* Fila del estudiante en la hoja de registro: gana la que más coincide;
+   -1 si no hay match, -2 si hay empate ambiguo. */
+function filaDeEstudiante_(reg, apellido, nombre) {
+  var buscado = tokens_(apellido + " " + nombre);
+  if (!buscado.length) return -1;
+  var mejor = -1, mejorScore = 0, empate = false;
+  for (var r = reg.filaEnc + 1; r < reg.datos.length; r++) {
+    var filaTxt = "";
+    if (reg.colApe >= 0) filaTxt += " " + reg.datos[r][reg.colApe];
+    if (reg.colNom >= 0) filaTxt += " " + reg.datos[r][reg.colNom];
+    if (reg.colApe < 0 && reg.colNom < 0) return -1;
+    var filaTokens = tokens_(filaTxt);
+    if (!filaTokens.length) continue;
+    var score = puntajeFila_(filaTokens, buscado);
+    if (score < 0) continue;
+    if (score > mejorScore) { mejor = r; mejorScore = score; empate = false; }
+    else if (score === mejorScore) empate = true;
+  }
+  if (mejor < 0 || empate) return -2;
+  return mejor;
+}
+function numNota_(v) {
+  if (v === "" || v === null) return -1;
+  var n = Number(String(v).replace(",", "."));
+  return isNaN(n) ? -1 : n;
+}
+
+/* CUESTIONARIO VIRTUAL: mejor nota del estudiante (0-10, medio punto). */
+function escribirMejorNota_(it) {
+  if (it.estado !== "entregado" || it.nota === "" || it.nota === null) return false;
+  var reg = encontrarRegistro_();
+  if (!reg || reg.colCuest < 0) return false;
+  var f = filaDeEstudiante_(reg, it.apellido, it.nombre);
+  if (f < 0) return false;
+  if (Number(it.nota) > numNota_(reg.datos[f][reg.colCuest])) {
+    reg.h.getRange(f + 1, reg.colCuest + 1).setValue(it.nota);
+    return true;
   }
   return false;
+}
+
+/* La columna JUEGO EDUCATIVO: PASAPALABRA la alimenta la app del Pasapalabra
+   (ranking.gs de pasapalabra-ia), no el quiz: queda sin uso aquí. */
+
+/* MEJOR DESEMPEÑO DE ACTIVIDADES VIRTUALES: 10 para el top 5 del ranking
+   (más aciertos en su mejor intento; en empate, menor tiempo). Si sale
+   del top 5, se borra el 10 que le correspondía. */
+function mejorIntentoPorEstudiante_() {
+  var h = H_INTENTOS();
+  var datos = h.getDataRange().getValues();
+  var mejores = {};
+  for (var i = 1; i < datos.length; i++) {
+    var v = datos[i];
+    if (v[7] !== "entregado") continue;
+    var clave = (String(v[3]) + "|" + String(v[4])).toLowerCase();
+    var corr = Number(v[11] || 0), seg = v[10] === "" ? 999999 : v[10];
+    if (!mejores[clave] || corr > mejores[clave].correctas ||
+        (corr === mejores[clave].correctas && seg < mejores[clave].segundos))
+      mejores[clave] = { apellido: v[3], nombre: v[4], correctas: corr, segundos: seg };
+  }
+  var lista = [];
+  for (var k in mejores) lista.push(mejores[k]);
+  lista.sort(function (x, y) {
+    if (y.correctas !== x.correctas) return y.correctas - x.correctas;
+    return x.segundos - y.segundos;
+  });
+  return lista;
+}
+function actualizarTop5_() {
+  var reg = encontrarRegistro_();
+  if (!reg || reg.colDesemp < 0) return;
+  var top5 = mejorIntentoPorEstudiante_().slice(0, 5);
+  var enTop = {};
+  top5.forEach(function (e) { enTop[(e.apellido + "|" + e.nombre).toLowerCase()] = 1; });
+  /* recorro los estudiantes con intentos: top5 -> 10, el resto -> borrar 10 */
+  var h = H_INTENTOS();
+  var datos = h.getDataRange().getValues();
+  var vistos = {};
+  for (var i = 1; i < datos.length; i++) {
+    if (datos[i][7] !== "entregado") continue;
+    var clave = (String(datos[i][3]) + "|" + String(datos[i][4])).toLowerCase();
+    if (vistos[clave]) continue;
+    vistos[clave] = 1;
+    var f = filaDeEstudiante_(reg, datos[i][3], datos[i][4]);
+    if (f < 0) continue;
+    var celda = reg.h.getRange(f + 1, reg.colDesemp + 1);
+    if (enTop[clave]) { if (numNota_(reg.datos[f][reg.colDesemp]) !== 10) celda.setValue(10); }
+    else if (numNota_(reg.datos[f][reg.colDesemp]) === 10) celda.setValue("");
+  }
 }
 
 function resp_(obj) {
@@ -2743,6 +2810,7 @@ function doPost(e) {
       it.correctas = correctas; it.nota = nota;
       upsertNota_(it);
       escribirMejorNota_(it);
+      actualizarTop5_();
       return resp_({ ok: true, correctas: correctas, nota: nota,
         segundos: segundos, aprobado: nota >= NOTA_APROBADO });
     });
