@@ -591,12 +591,14 @@ function verRanking() {
       av.alt = ""; f.appendChild(av);
       var datos = el("span", "rank-datos");
       datos.appendChild(el("b", "", capitalizar_(e.nombre) + " " + capitalizar_(e.apellido)));
-      datos.appendChild(el("small", "", e.curso + " · " + e.correctas + " aciertos · " +
-        (e.intentos || 1) + " intento" + ((e.intentos || 1) === 1 ? "" : "s")));
+      datos.appendChild(el("small", "", e.curso + " · " +
+        (e.intentos || 1) + " intento" + ((e.intentos || 1) === 1 ? "" : "s") +
+        " · mejor nota " + String(Math.floor(e.nota)).replace(".", ",")));
       f.appendChild(datos);
-      var nota = el("span", "rank-nota", String(e.nota).replace(".", ","));
-      if (e.nota >= NOTA_APROBADO) nota.classList.add("aprobada");
-      f.appendChild(nota);
+      var acc = el("span", "rank-aciertos");
+      acc.appendChild(el("b", "", String(e.correctas)));
+      acc.appendChild(el("small", "", "aciertos"));
+      f.appendChild(acc);
       if (i < 5) podio.appendChild(f); else lista.appendChild(f);
     });
   }).catch(function () {

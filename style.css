@@ -191,6 +191,9 @@ input, textarea { -webkit-user-select: text; user-select: text; }
 .rank-datos small { color: #7a70a8; font-size: 12px; }
 .rank-nota { font-size: 20px; font-weight: 800; color: var(--violeta); flex-shrink: 0; }
 .rank-nota.aprobada { color: var(--ok); }
+.rank-aciertos { display: flex; flex-direction: column; align-items: center; flex-shrink: 0; min-width: 52px; }
+.rank-aciertos b { font-size: 22px; font-weight: 800; color: var(--ok); line-height: 1.1; }
+.rank-aciertos small { font-size: 11px; color: var(--ok); }
 #rank-lista { display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px; }
 .card.premio { display: flex; gap: 12px; align-items: center; margin-bottom: 14px;
   border-color: #f2b01e; background: linear-gradient(120deg, #fff8e6, #fff); }
