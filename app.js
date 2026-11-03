@@ -591,8 +591,8 @@ function verRanking() {
       av.alt = ""; f.appendChild(av);
       var datos = el("span", "rank-datos");
       datos.appendChild(el("b", "", capitalizar_(e.nombre) + " " + capitalizar_(e.apellido)));
-      datos.appendChild(el("small", "", e.curso + " · " + e.correctas + " aciertos · " + fmtTiempo(e.segundos || 0) +
-        " · " + (e.intentos || 1) + " intento" + ((e.intentos || 1) === 1 ? "" : "s")));
+      datos.appendChild(el("small", "", e.curso + " · " + e.correctas + " aciertos · " +
+        (e.intentos || 1) + " intento" + ((e.intentos || 1) === 1 ? "" : "s")));
       f.appendChild(datos);
       var nota = el("span", "rank-nota", String(e.nota).replace(".", ","));
       if (e.nota >= NOTA_APROBADO) nota.classList.add("aprobada");
