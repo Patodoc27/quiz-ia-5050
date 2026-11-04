@@ -122,6 +122,9 @@ input, textarea { -webkit-user-select: text; user-select: text; }
   background: #ece7fd; color: var(--violeta-osc); font-weight: 800; text-transform: uppercase; }
 .opcion.sel { border-color: var(--violeta); background: #f2edff; }
 .opcion.sel .letra { background: var(--violeta); color: #fff; }
+.opcion.ok { border-color: var(--ok); background: #e8f6ee; }
+.opcion.ok .letra { background: var(--ok); color: #fff; }
+.opcion .ico-tilde { width: 22px; height: 22px; color: var(--ok); flex-shrink: 0; align-self: center; margin-left: auto; }
 .opcion:active { transform: scale(.99); }
 
 .navquiz { display: flex; gap: 10px; padding: 12px 18px calc(16px + env(safe-area-inset-bottom));

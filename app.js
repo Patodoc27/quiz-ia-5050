@@ -58,6 +58,7 @@ var estado = {
   attemptId: null,
   items: null,
   respuestas: {},
+  aciertos: {},
   idx: 0,
   startedAt: 0,
   anulado: false,
@@ -72,7 +73,7 @@ function guardarLS() {
     localStorage.setItem(LS_KEY, JSON.stringify({
       deviceId: estado.deviceId, studentId: estado.studentId,
       apellido: estado.apellido, nombre: estado.nombre, avatar: estado.avatar,
-      attemptId: estado.attemptId, items: estado.items, respuestas: estado.respuestas,
+      attemptId: estado.attemptId, items: estado.items, respuestas: estado.respuestas, aciertos: estado.aciertos,
       idx: estado.idx, startedAt: estado.startedAt,
       anulado: estado.anulado, entregado: estado.entregado
     }));
@@ -86,7 +87,7 @@ function leerLS() {
 }
 function limpiarIntentoLS() {
   var s = leerLS() || {};
-  delete s.attemptId; delete s.items; delete s.respuestas;
+  delete s.attemptId; delete s.items; delete s.respuestas; delete s.aciertos;
   delete s.idx; delete s.startedAt; delete s.anulado; delete s.entregado;
   try { localStorage.setItem(LS_KEY, JSON.stringify(s)); } catch (e) {}
 }
@@ -230,6 +231,7 @@ function sortearItems() {
 function nuevoIntento() {
   estado.items = sortearItems();
   estado.respuestas = {};
+  estado.aciertos = {};
   estado.idx = 0;
   estado.anulado = false;
   estado.entregado = false;
@@ -379,6 +381,13 @@ function bancoDe(qid) {
   for (var i = 0; i < BANCO.length; i++) if (BANCO[i].id === qid) return BANCO[i];
   return null;
 }
+function tildeSVG() {
+  var s = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  s.setAttribute("viewBox", "0 0 24 24");
+  s.setAttribute("class", "ico-tilde");
+  s.innerHTML = '<path d="M4.5 12.5l5 5 10-11" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>';
+  return s;
+}
 function renderPregunta() {
   var item = estado.items[estado.idx];
   var q = bancoDe(item.qid);
@@ -388,22 +397,43 @@ function renderPregunta() {
   $("q-enunciado").textContent = q.enunciado;
   var box = $("q-opciones"); box.innerHTML = "";
   var marcada = estado.respuestas[item.qid];
+  var okOid = estado.aciertos[item.qid];
   item.opciones.forEach(function (op) {
-    var b = el("button", "opcion" + (marcada === op.oid ? " sel" : ""));
+    var acerto = okOid === op.oid && marcada === op.oid;
+    var b = el("button", "opcion" + (marcada === op.oid ? " sel" : "") + (acerto ? " ok" : ""));
     b.type = "button";
     b.appendChild(el("span", "letra", op.letra));
     b.appendChild(el("span", "", op.texto));
+    if (acerto) b.appendChild(tildeSVG());
     b.addEventListener("click", function () {
       estado.respuestas[item.qid] = op.oid;
       guardarLS();
       var ops = box.querySelectorAll(".opcion");
       for (var k = 0; k < ops.length; k++) ops[k].classList.remove("sel");
       b.classList.add("sel");
+      var avanzado = false;
+      var avanzar = function () {
+        if (avanzado) return;
+        avanzado = true;
+        if (estado.idx < estado.items.length - 1) {
+          estado.idx++; guardarLS(); renderPregunta();
+        }
+      };
       api({ action: "respuesta", attemptId: estado.attemptId, qid: item.qid, oid: op.oid, idx: estado.idx })
-        .catch(function () {});
-      if (estado.idx < estado.items.length - 1) {
-        setTimeout(function () { estado.idx++; guardarLS(); renderPregunta(); }, 260);
-      }
+        .then(function (r) {
+          /* acierto confirmado por el servidor: marca verde con tilde.
+             Si erró no se marca nada (la correcta queda oculta). */
+          if (r && r.acerto === true) {
+            estado.aciertos[item.qid] = op.oid;
+            guardarLS();
+            b.classList.add("ok");
+            b.appendChild(tildeSVG());
+            setTimeout(avanzar, 650);
+          } else {
+            setTimeout(avanzar, 260);
+          }
+        })
+        .catch(function () { setTimeout(avanzar, 260); });
       renderNav();
     });
     box.appendChild(b);
@@ -630,6 +660,7 @@ function init() {
           estado.attemptId = guardado.attemptId;
           estado.items = r.items || guardado.items;
           estado.respuestas = r.respuestas || guardado.respuestas || {};
+          estado.aciertos = guardado.aciertos || {};
           estado.idx = Math.min(guardado.idx || 0, estado.items.length - 1);
           estado.startedAt = guardado.startedAt || Date.now();
           pedirFullscreen().then(function () { entrarQuiz(); });
