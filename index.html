@@ -1,173 +1,25 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
-<meta name="theme-color" content="#1b0f57">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="mobile-web-app-capable" content="yes">
-<link rel="manifest" href="manifest.webmanifest">
-<link rel="icon" href="avatars/a4.webp">
-<title>Quiz de IA — Colegio Secundario N°5050</title>
-<link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cuestionario virtual · Finalizado</title>
+<style>
+  html,body{margin:0;height:100%;background:#fbf4ec;}
+  body{display:flex;align-items:center;justify-content:center;font-family:"Segoe UI",Arial,sans-serif;}
+  img{max-width:100vw;max-height:100vh;width:auto;height:auto;display:block;}
+  .txt{display:none;text-align:center;color:#141a3a;padding:2rem;font-size:clamp(1.4rem,4vw,2.6rem);font-weight:800;line-height:1.3;}
+  .txt span{background:#7a1430;color:#fff;border-radius:.4em;padding:.05em .4em;}
+</style>
 </head>
 <body>
-
-<!-- ============ PANTALLA 1 · INICIO ============ -->
-<section id="p-inicio" class="pantalla visible">
-  <img src="hero.jpg" alt="Quiz de IA — Ideas Brillantes" class="hero-img">
-  <div class="hero-overlay">
-    <div class="hero-txt">
-      <img src="assets/escudo.png" alt="Escudo Colegio N°5050" class="escudo">
-      <h1>Quiz de IA</h1>
-      <p class="sub2">Claves para una interacción crítica y efectiva<br>con la inteligencia artificial</p>
-    </div>
-    <div class="hero-acciones">
-      <p class="hero-mini">20 preguntas · cada acierto 0,5 · top 5 gana 10 adicional</p>
-      <button id="btn-ir-registro" class="btn btn-primario">Registrarse</button>
-      <button id="btn-ranking" class="btn btn-sec">Calificaciones</button>
-      <button id="btn-docente" class="link-docente">Acceso docente</button>
-    </div>
-  </div>
-</section>
-
-<!-- ============ PANTALLA 2 · REGISTRO ============ -->
-<section id="p-registro" class="pantalla">
-  <header class="barra"><h2>Tu registro</h2><p>Colegio Secundario N°5050 · Quiz de IA</p></header>
-  <div class="contenido">
-    <label class="etiqueta">Elegí tu avatar</label>
-    <div id="avatar-grid" class="avatar-grid"></div>
-
-    <label class="etiqueta" for="f-apellido">Apellido/s</label>
-    <input id="f-apellido" class="campo" type="text" autocomplete="off" autocapitalize="words" placeholder="Ej.: Castro">
-    <label class="etiqueta" for="f-nombre">Nombre/s</label>
-    <input id="f-nombre" class="campo" type="text" autocomplete="off" autocapitalize="words" placeholder="Ej.: Patricia">
-    <label class="etiqueta">Curso</label>
-    <div class="campo curso-fijo">5° 1°</div>
-
-    <div class="card reglas">
-      <p><b>Antes de empezar:</b></p>
-      <ul>
-        <li>Son 20 preguntas, una por pantalla.</li>
-        <li>Marcás la opción que elijas; podés cambiarla hasta tocar <b>Entregar</b>.</li>
-        <li>Nadie te dice si acertaste: la nota se revela solo al final.</li>
-        <li>Podés intentarlo todas las veces que quieras.</li>
-        <li>Los 5 primeros del ranking en <b>Calificaciones</b> (oro, plata y 3 bronce) se llevan un <b>10 adicional</b>.</li>
-        <li>El intento va en pantalla completa. Si salís, se anula.</li>
-      </ul>
-    </div>
-    <p id="reg-error" class="error"></p>
-    <button id="btn-comenzar" class="btn btn-primario">Comenzar</button>
-    <button id="btn-volver-inicio" class="link-docente">Volver</button>
-  </div>
-</section>
-
-<!-- ============ PANTALLA 3 · INTENTO ============ -->
-<section id="p-quiz" class="pantalla">
-  <header class="barra barra-quiz">
-    <img id="q-avatar" class="mini-avatar" alt="">
-    <div class="quien">
-      <b id="q-nombre">—</b>
-      <span id="q-curso">5° 1°</span>
-    </div>
-    <div class="datos">
-      <span class="dato">Nota <b id="q-nota">—</b></span>
-      <span class="dato"><svg viewBox="0 0 24 24" class="ico-s"><circle cx="12" cy="13" r="8" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 9.5V13l2.5 1.5M9 3h6" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round"/></svg><b id="q-tiempo">00:00</b></span>
-    </div>
-  </header>
-  <div class="progreso"><div id="barra-prog"></div><span id="q-contador">Pregunta 1 de 20</span></div>
-  <div class="contenido quiz">
-    <div id="q-recurso"></div>
-    <p id="q-enunciado" class="enunciado"></p>
-    <div id="q-opciones"></div>
-  </div>
-  <nav class="navquiz">
-    <button id="btn-anterior" class="btn btn-sec">‹ Anterior</button>
-    <button id="btn-siguiente" class="btn btn-sec">Siguiente ›</button>
-    <button id="btn-entregar" class="btn btn-entregar oculto">Entregar</button>
-  </nav>
-</section>
-
-<!-- ============ PANTALLA 4 · RESULTADO ============ -->
-<section id="p-resultado" class="pantalla">
-  <div class="contenido centrado">
-    <img id="r-avatar" class="avatar-grande" alt="">
-    <h2 id="r-nombre">—</h2>
-    <p class="sub">Quiz entregado · 5° 1°</p>
-    <div class="card resultado">
-      <p class="correctas"><b id="r-correctas">0</b><span>/ 20 correctas</span></p>
-      <p class="nota-final">Nota: <b id="r-nota">0</b></p>
-      <p id="r-aprobado" class="badge"></p>
-      <p class="tiempo">Tiempo: <b id="r-tiempo">—</b></p>
-    </div>
-    <p class="nota-chica">No se muestran las respuestas correctas. Podés reintentar todas las veces que quieras. Mirá <b>Calificaciones</b>: el top 5 se lleva un 10 adicional.</p>
-    <button id="btn-reintentar" class="btn btn-primario">Intentar de nuevo</button>
-  </div>
-</section>
-
-<!-- ============ PANTALLA 5 · ANULADO ============ -->
-<section id="p-anulado" class="pantalla">
-  <div class="contenido centrado">
-    <svg viewBox="0 0 24 24" class="ico-alerta"><path d="M12 3 2.5 20h19L12 3z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M12 9.5v5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="12" cy="17" r="1.1" fill="currentColor"/></svg>
-    <h2>Intento anulado</h2>
-    <p id="a-motivo" class="motivo">Saliste del intento.</p>
-    <p class="nota-chica">La regla del quiz es que se responde sin salir de la app. Quedó registrado. Podés empezar un intento nuevo.</p>
-    <button id="btn-recomenzar" class="btn btn-primario">Volver a empezar</button>
-  </div>
-</section>
-
-<!-- ============ PANTALLA 7 · CALIFICACIONES ============ -->
-<section id="p-ranking" class="pantalla">
-  <header class="barra"><h2>Calificaciones</h2><p>Aciertos acumulados de cada estudiante · 5° 1°</p></header>
-  <div class="contenido">
-    <div class="card premio">
-      <svg viewBox="0 0 24 24" class="medalla oro" aria-hidden="true"><path d="M8 2h3.2L12 7l.8-5H16l-2.4 8.4" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="12" cy="15.5" r="6" fill="currentColor"/><path d="M12 12.2l1 2 2.2.3-1.6 1.6.4 2.2-2-1-2 1 .4-2.2-1.6-1.6 2.2-.3z" fill="#fff"/></svg>
-      <p><b>Premio:</b> quienes estén en el top 5 (oro, plata y 3 bronce) reciben un <b>10 adicional</b>. Se suman los aciertos de todos tus intentos: a más aciertos, más arriba.</p>
-    </div>
-    <div id="rank-podium" class="podium"></div>
-    <div id="rank-lista"></div>
-    <p class="nota-chica">Se actualiza solo: cada intento entregado suma. ¿No estás primero? ¡Todavía podés intentarlo otra vez!</p>
-    <button id="btn-rank-volver" class="btn btn-sec">Volver</button>
-  </div>
-</section>
-
-<!-- ============ PANTALLA 6 · DOCENTE ============ -->
-<section id="p-docente" class="pantalla">
-  <header class="barra"><h2>Vista docente</h2><p>Quiz de IA · 5° 1°</p></header>
-  <div class="contenido" id="doc-login">
-    <label class="etiqueta" for="doc-pin">Contraseña</label>
-    <input id="doc-pin" class="campo" type="password" inputmode="numeric" placeholder="PIN docente">
-    <p id="doc-error" class="error"></p>
-    <button id="btn-doc-entrar" class="btn btn-primario">Entrar</button>
-    <button id="btn-doc-volver" class="link-docente">Volver al inicio</button>
-  </div>
-  <div class="contenido oculto" id="doc-panel">
-    <div class="panel-acciones">
-      <button id="btn-csv" class="btn btn-sec chico">Exportar CSV</button>
-      <button id="btn-doc-actualizar" class="btn btn-sec chico">Actualizar</button>
-    </div>
-    <div id="doc-tabla"></div>
-    <div id="doc-detalle" class="oculto"></div>
-  </div>
-</section>
-
-<!-- Modal confirmar entrega -->
-<div id="modal" class="modal oculto">
-  <div class="modal-card">
-    <h3 id="m-titulo">¿Entregar el quiz?</h3>
-    <p id="m-texto"></p>
-    <div class="modal-btns">
-      <button id="m-cancelar" class="btn btn-sec">Seguir respondiendo</button>
-      <button id="m-confirmar" class="btn btn-entregar">Entregar</button>
-    </div>
-  </div>
-</div>
-
-<div id="toast" class="toast oculto"></div>
-
-<script src="data.js"></script>
-<script src="config.js"></script>
-<script src="sorteo.js"></script>
-<script src="app.js"></script>
+<img id="cartel" src="Cuestionario_virtual_finalizado_notas_disponibles.png" alt="El cuestionario virtual finalizó el 18/11/2026. Las notas ya están disponibles en su plataforma.">
+<div class="txt">El cuestionario <span>virtual</span> finalizó el <span>18/11/2026.</span><br>Las notas ya están disponibles en su plataforma.</div>
+<script>
+  var alt=['Cuestionario%20virtual%20finalizado%20notas%20disponibles.png','img/Cuestionario_virtual_finalizado_notas_disponibles.png','img/Cuestionario%20virtual%20finalizado%20notas%20disponibles.png'];
+  var im=document.getElementById('cartel');
+  im.onerror=function(){ if(alt.length){ im.src=alt.shift(); } else { im.style.display='none'; document.querySelector('.txt').style.display='block'; } };
+  if(im.complete && im.naturalWidth===0){ im.onerror(); }
+</script>
 </body>
 </html>
